@@ -51,7 +51,7 @@ func HandleCreateBook(appctx appctx.AppContext) func(*gin.Context) {
 		ctx.JSON(http.StatusOK, common.ResponseOKSuccess(
 			"Create a book successfully",
 			bookItem,
-			gin.H{"data": bookItem.ID},
+			gin.H{"data": bookItem.Id},
 		))
 	}
 }

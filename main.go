@@ -13,7 +13,9 @@ import (
 	appctx "local-app/component/appcontext"
 
 	bookmodel "local-app/modules/books/models"
+	usermodel "local-app/modules/users/models"
 	bookroute "local-app/routes/books"
+	userroute "local-app/routes/users"
 )
 
 var db *gorm.DB // Database connection
@@ -41,7 +43,7 @@ func main() {
 	}
 
 	// Auto-migrate the schema
-	if err := db.AutoMigrate(&bookmodel.Book{}); err != nil {
+	if err := db.AutoMigrate(&bookmodel.Book{}, &usermodel.User{}); err != nil {
 		log.Fatal(err)
 	}
 
@@ -55,6 +57,7 @@ func main() {
 		// Define a health check endpoint
 		routeGroups.GET("/health-check", heathCheck)
 		bookroute.Routes(routeGroups, appCtx)
+		userroute.Routes(routeGroups, appCtx)
 	}
 
 	// Start server
