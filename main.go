@@ -8,17 +8,34 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
-	bookmodel "local-app/module/books/models"
-	bookview "local-app/module/books/transports"
+	appctx "local-app/component/appcontext"
+
+	bookmodel "local-app/modules/books/models"
+	bookroute "local-app/routes/books"
 )
 
 var db *gorm.DB // Database connection
 
 func main() {
+	// Load the environment variables from .env file
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// Connect to SQLite database
 	var err error
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+
+	// // Read environment variables
+	// dbHost := os.Getenv("DB_HOST")
+	// dbUser := os.Getenv("DB_USER")
+	// dbPassword := os.Getenv("DB_PASSWORD")
+
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+		// Example usage for other databases
+		// DSN: fmt.Sprintf("%s:%s@tcp(%s)/dbname", dbUser, dbPassword, dbHost),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,6 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	appCtx := appctx.NewAppContext(db)
 	// Initialize Gin router
 	router := gin.Default()
 
@@ -36,14 +54,7 @@ func main() {
 	{
 		// Define a health check endpoint
 		routeGroups.GET("/health-check", heathCheck)
-		bookGroup := routeGroups.Group("/books")
-		{
-			bookGroup.GET("", bookview.HandleListBook(db))
-			bookGroup.POST("", bookview.HandleCreateBook(db))
-			bookGroup.GET("/:id", bookview.HandleFindAnBook(db))
-			bookGroup.PUT("/:id", bookview.HandleUpdateAnBook(db))
-			bookGroup.DELETE("/:id", bookview.HandleDeleteAnBook(db))
-		}
+		bookroute.Routes(routeGroups, appCtx)
 	}
 
 	// Start server

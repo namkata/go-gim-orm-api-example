@@ -2,7 +2,7 @@ package bookbiz
 
 import (
 	"context"
-	bookmodel "local-app/module/books/models"
+	bookmodel "local-app/modules/books/models"
 )
 
 // CreateBookStorage defines the interface for creating a book.

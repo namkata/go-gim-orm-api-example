@@ -3,7 +3,7 @@ package bookstorage
 import (
 	"context"
 
-	bookmodel "local-app/module/books/models"
+	bookmodel "local-app/modules/books/models"
 )
 
 // DeleteBook deletes book data from the database based on specified conditions.

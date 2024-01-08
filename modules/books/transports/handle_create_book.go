@@ -5,21 +5,27 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
-	bookbiz "local-app/module/books/biz"
-	bookmodel "local-app/module/books/models"
-	bookstorage "local-app/module/books/storages"
+	"local-app/common"
+	appctx "local-app/component/appcontext"
+
+	bookbiz "local-app/modules/books/biz"
+	bookmodel "local-app/modules/books/models"
+	bookstorage "local-app/modules/books/storages"
 )
 
 // HandleCreateBook handles the creation of a new book entry endpoint.
-func HandleCreateBook(db *gorm.DB) gin.HandlerFunc {
+func HandleCreateBook(appctx appctx.AppContext) func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		var bookItem bookmodel.Book
 
 		// Retrieve book information from the request
 		if err := ctx.ShouldBind(&bookItem); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusBadRequest, common.BadResponseFailure(
+				err.Error(),
+				bookItem,
+				gin.H{"data": false},
+			))
 			return
 		}
 
@@ -27,16 +33,25 @@ func HandleCreateBook(db *gorm.DB) gin.HandlerFunc {
 		bookItem.Name = strings.TrimSpace(bookItem.Name)
 
 		// Initialize storage and business logic components
+		db := appctx.GetDBConnection()
 		storage := bookstorage.NewDBStorage(db)
 		biz := bookbiz.NewCreateBookBiz(storage)
 
 		// Attempt to create a new book entry
 		if err := biz.CreateBook(ctx.Request.Context(), &bookItem); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusBadRequest, common.BadResponseFailure(
+				err.Error(),
+				bookItem,
+				gin.H{"data": false},
+			))
 			return
 		}
 
 		// Respond with the ID of the created book
-		ctx.JSON(http.StatusOK, gin.H{"data": bookItem.ID})
+		ctx.JSON(http.StatusOK, common.ResponseOKSuccess(
+			"Create a book successfully",
+			bookItem,
+			gin.H{"data": bookItem.ID},
+		))
 	}
 }

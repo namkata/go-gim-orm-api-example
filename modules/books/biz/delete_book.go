@@ -3,7 +3,7 @@ package bookbiz
 import (
 	"context"
 
-	bookmodel "local-app/module/books/models"
+	bookmodel "local-app/modules/books/models"
 )
 
 // DeleteBookStorage specifies the methods needed for deleting book data.

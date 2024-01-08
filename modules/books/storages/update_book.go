@@ -3,7 +3,7 @@ package bookstorage
 import (
 	"context"
 
-	bookmodel "local-app/module/books/models"
+	bookmodel "local-app/modules/books/models"
 )
 
 // UpdateBook updates the book information based on a specific condition with new data.

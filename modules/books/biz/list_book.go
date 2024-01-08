@@ -2,12 +2,18 @@ package bookbiz
 
 import (
 	"context"
-	bookmodel "local-app/module/books/models"
+	"local-app/common"
+	bookmodel "local-app/modules/books/models"
 )
 
 // ListBookStorage defines the interface for listing books.
 type ListBookStorage interface {
-	ListBook(ctx context.Context, condition map[string]interface{}, paging *bookmodel.DataPaging) ([]bookmodel.Book, error)
+	ListBook(
+		ctx context.Context,
+		condition map[string]interface{},
+		filter *bookmodel.Filter,
+		paging *common.Paging,
+	) ([]bookmodel.Book, error)
 }
 
 // listBookBiz represents the business logic for listing books.
@@ -21,9 +27,13 @@ func NewListBookBiz(store ListBookStorage) *listBookBiz {
 }
 
 // ListBook retrieves a list of books based on conditions and pagination.
-func (biz *listBookBiz) ListBook(ctx context.Context, condition map[string]interface{}, paging *bookmodel.DataPaging) ([]bookmodel.Book, error) {
+func (biz *listBookBiz) ListBook(
+	ctx context.Context,
+	filter *bookmodel.Filter,
+	paging *common.Paging,
+) ([]bookmodel.Book, error) {
 	// Delegate the call to the storage layer
-	result, err := biz.store.ListBook(ctx, condition, paging)
+	result, err := biz.store.ListBook(ctx, map[string]interface{}{}, filter, paging)
 	if err != nil {
 		return nil, err
 	}

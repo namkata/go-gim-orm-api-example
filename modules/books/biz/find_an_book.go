@@ -2,7 +2,7 @@ package bookbiz
 
 import (
 	"context"
-	bookmodel "local-app/module/books/models"
+	bookmodel "local-app/modules/books/models"
 )
 
 // FindBookStorage defines the interface for finding a book in storage.
